@@ -2,9 +2,10 @@
 #define __VOILE_IOPIN_74595_H__
 
 #include "voile_interface_iopin.h"
+#include "voile_74595.h"
 
 /**
- * @brief Operate 74595 as same as gpio
+ * @brief Operate 74595 as same as gpio for init
  * 
  */
 typedef const struct{
@@ -18,51 +19,10 @@ typedef const struct{
     // Number of cascades
     const uint8_t cascade;
 
-    // _SRCLR pin
-    voile_const_ioPin_t *_SRCLR;
+    // 595 config
+    voile_const_internal_74595_t *chip;
 
-    // _OE pin
-    voile_const_ioPin_t *_OE;
-    
-    // SRCLK pin
-    voile_const_ioPin_t *SRCLK;
-    
-    // SER pin
-    voile_const_ioPin_t *SER;
-    
-    // _RCLK pin
-    voile_const_ioPin_t *RCLK;
-
-    // How to read back io output state
-    union {
-
-        // Storige io state by memory
-        struct {
-
-            // Symbol
-            uint8_t select  : 1;
-            uint8_t         : 7;
-
-            // Point to variable
-            uint8_t *Memory;
-
-        } byMemory;
-
-        // Use QH' read shift register
-        struct {
-            // Symbol
-            uint8_t         : 1;
-            uint8_t select  : 1;
-            uint8_t         : 6;
-
-            // QH' pin
-            voile_const_ioPin_t *QH_;
-
-        } byQH;
-
-    } readBackMode;
-
-} voile_const_internal_ioPin_rp2040_t;
+} voile_const_internal_ioPin_74595_t;
 
 // The functions operate the pin
 extern voile_const_ioPin_Operate_t voile_const_ioPin_Operate_74595;
@@ -75,7 +35,7 @@ extern voile_const_ioPin_Get_t voile_const_ioPin_Get_74595;
 /**
  * @brief Initialise or reinitialise a IO and set IO mode and default output value
  * 
- * @param[in] this :[voile_const_internal_ioPin_rp2040_t *]This ioPin object.
+ * @param[in] this :[voile_const_internal_ioPin_74595_t *]This ioPin object.
  * @param[in] mode :[voile_io_mode_t]Which mode select to use @ref voile_io_mode_t.
  * @param[in] value :[bool](option when input mode)If 0 clear the IO, 1 set it. Input mode will ignore this param.
  * @return voile_status_t.
@@ -89,12 +49,12 @@ extern voile_const_ioPin_Get_t voile_const_ioPin_Get_74595;
  * 74595 only support the push-pull mode.
  * 
  */
-voile_status_t voile_ioPin_Operate_Init_74595(voile_const_internal_ioPin_rp2040_t *, voile_io_mode_t, bool);
+voile_status_t voile_ioPin_Operate_Init_74595(voile_const_internal_ioPin_74595_t *, voile_io_mode_t, bool);
 
 /**
  * @brief Drive a single IO high/low
  * 
- * @param[in] this :[voile_const_internal_ioPin_rp2040_t *]This ioPin object.
+ * @param[in] this :[voile_const_internal_ioPin_74595_t *]This ioPin object.
  * @param[in] value :[bool]If 0 clear the IO, 1 set it.
  * @return voile_status_t.
  *
@@ -104,15 +64,15 @@ voile_status_t voile_ioPin_Operate_Init_74595(voile_const_internal_ioPin_rp2040_
  * @endcode
  *  
  */
-voile_status_t voile_ioPin_Operate_Write_74595(voile_const_internal_ioPin_rp2040_t *, bool);
+voile_status_t voile_ioPin_Operate_Write_74595(voile_const_internal_ioPin_74595_t *, bool);
 
 // 74595 can't read io
-#define voile_ioPin_Operate_Read_74595 ((voile_status_t (*)(voile_const_internal_ioPin_rp2040_t *, bool *))voile_ReturnHardwareUnsupportedError)
+#define voile_ioPin_Operate_Read_74595 ((voile_status_t (*)(voile_const_internal_ioPin_74595_t *, bool *))voile_ReturnHardwareUnsupportedError)
 
 /**
  * @brief Toggle a single io
  * 
- * @param[in] this :[voile_const_internal_ioPin_rp2040_t *]This ioPin object.
+ * @param[in] this :[voile_const_internal_ioPin_74595_t *]This ioPin object.
  * @return voile_status_t.
  *
  * @par Sample
@@ -121,12 +81,12 @@ voile_status_t voile_ioPin_Operate_Write_74595(voile_const_internal_ioPin_rp2040
  * @endcode
  *  
  */
-voile_status_t voile_ioPin_Operate_Taggle_74595(voile_const_internal_ioPin_rp2040_t *);
+voile_status_t voile_ioPin_Operate_Taggle_74595(voile_const_internal_ioPin_74595_t *);
 
 /**
  * @brief Get state of a single specified IO output
  * 
- * @param[in] this :[voile_const_internal_ioPin_rp2040_t *]This ioPin object.
+ * @param[in] this :[voile_const_internal_ioPin_74595_t *]This ioPin object.
  * @param[out] value :[bool *]Current state of the GPIO output. 0 for low, 1 for high.
  * @return voile_status_t.
  *
@@ -137,17 +97,17 @@ voile_status_t voile_ioPin_Operate_Taggle_74595(voile_const_internal_ioPin_rp204
  * @endcode
  *  
  */
-voile_status_t voile_ioPin_Operate_ReadRegister_74595(voile_const_internal_ioPin_rp2040_t *, bool *);
+voile_status_t voile_ioPin_Operate_ReadRegister_74595(voile_const_internal_ioPin_74595_t *, bool *);
 
 
 
 // 74595 can't read io
-#define voile_ioPin_Get_Read_74595 ((bool (*)(voile_const_internal_ioPin_rp2040_t *))voile_ReturnHardwareUnsupportedError)
+#define voile_ioPin_Get_Read_74595 ((bool (*)(voile_const_internal_ioPin_74595_t *))voile_ReturnHardwareUnsupportedError)
 
 /**
  * @brief Get state of a single specified IO output
  * 
- * @param[in] this :[voile_const_internal_ioPin_rp2040_t *]This ioPin object.
+ * @param[in] this :[voile_const_internal_ioPin_74595_t *]This ioPin object.
  * @return [bool]Current state of the GPIO output. 0 for low, 1 for high.
  *
  * @par Sample
@@ -156,7 +116,7 @@ voile_status_t voile_ioPin_Operate_ReadRegister_74595(voile_const_internal_ioPin
  * @endcode
  *  
  */
-bool voile_ioPin_Get_ReadRegister_74595(voile_const_internal_ioPin_rp2040_t *);
+bool voile_ioPin_Get_ReadRegister_74595(voile_const_internal_ioPin_74595_t *);
 
 #endif // !__VOILE_IOPIN_74595_H__
 
