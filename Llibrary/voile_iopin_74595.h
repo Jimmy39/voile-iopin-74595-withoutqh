@@ -22,6 +22,9 @@ typedef const struct{
     // 595 config
     voile_const_internal_74595_t *chip;
 
+    // The number of pin, begin 0. For example, QC in 1st cascade is 2, QA in 2st cascade is 8
+    const uint8_t pinNumber;
+
 } voile_const_internal_ioPin_74595_t;
 
 // The functions operate the pin
@@ -100,6 +103,19 @@ voile_status_t voile_ioPin_Operate_Taggle_74595(voile_const_internal_ioPin_74595
 voile_status_t voile_ioPin_Operate_ReadRegister_74595(voile_const_internal_ioPin_74595_t *, bool *);
 
 
+/**
+ * @brief Get state of a single io output
+ * 
+ * @param[in] this :[voile_const_internal_ioPin_74595_t *]This ioPin object.
+ * @return [bool]Current state of the IO init. 0 for not init, 1 for init.
+ *
+ * @par Sample
+ * @code {.C}
+ * value = voile_ioPin_Get_IfInit_74595(&myIO);
+ * @endcode
+ *  
+ */
+bool voile_ioPin_Get_IfInit_74595(voile_const_internal_ioPin_74595_t *);
 
 // 74595 can't read io
 #define voile_ioPin_Get_Read_74595 ((bool (*)(voile_const_internal_ioPin_74595_t *))voile_ReturnHardwareUnsupportedError)
