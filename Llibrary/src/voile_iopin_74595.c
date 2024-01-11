@@ -1,8 +1,5 @@
 #include "voile_iopin_74595.h"
 
-#include "voile_uart_rp2040.h"
-
-extern voile_const_uart_t uart;
 
 
 voile_const_ioPin_Operate_t voile_const_ioPin_Operate_74595 = {
@@ -39,7 +36,6 @@ voile_status_t voile_ioPin_Operate_Init_74595(voile_const_internal_ioPin_74595_t
             if (this->chip->state != NULL) {
                 *(this->chip->state+i) = date;
             }
-    uart.Operate->Transmit(&uart, i);
         }
         voile_74595_Operate_Load(this->chip);
         if ((mode == IOmodeQuasiBidirectional)||(mode == IOmodePushPull)||(mode == IOmodeOpenDrain)) {
@@ -61,12 +57,11 @@ voile_status_t voile_ioPin_Operate_Write_74595(voile_const_internal_ioPin_74595_
             *(this->chip->state+this->pinNumber/8) &= ~(1ul << (this->pinNumber%8));
         }
         voile_74595_Operate_ShiftBytes(this->chip, this->chip->state, this->cascade);
-    uart.Operate->Transmit(&uart, *(this->chip->state));
         voile_74595_Operate_Load(this->chip);
         return success;
     }
     else if (this->chip->QH_ != NULL) {
-        
+        //this->chip->QH_->Get->Read(this->chip->QH_)
         return success;
     }
     else {
@@ -74,11 +69,20 @@ voile_status_t voile_ioPin_Operate_Write_74595(voile_const_internal_ioPin_74595_
     }
 }
 
-voile_status_t voile_ioPin_Operate_Taggle_74595(voile_const_internal_ioPin_74595_t *ioPin_p) {
-    return success;
+voile_status_t voile_ioPin_Operate_Taggle_74595(voile_const_internal_ioPin_74595_t *this) {
+    if (this->chip->state != NULL) {
+        *(this->chip->state+this->pinNumber/8) ^= 1ul << (this->pinNumber%8);
+        voile_74595_Operate_ShiftBytes(this->chip, this->chip->state, this->cascade);
+        voile_74595_Operate_Load(this->chip);
+        return success;
+    }
+    else {
+        return failure;
+    }
 }
 
-voile_status_t voile_ioPin_Operate_ReadRegister_74595(voile_const_internal_ioPin_74595_t *ioPin_p, bool *value) {
+voile_status_t voile_ioPin_Operate_ReadRegister_74595(voile_const_internal_ioPin_74595_t *this, bool *value) {
+    *value = !!(*(this->chip->state+this->pinNumber/8) & (1ul << (this->pinNumber%8)));
     return success;
 }
 
@@ -86,6 +90,6 @@ bool voile_ioPin_Get_IfInit_74595(voile_const_internal_ioPin_74595_t *this) {
     return 0;
 }
 
-bool voile_ioPin_Get_ReadRegister_74595(voile_const_internal_ioPin_74595_t *ioPin_p) {
-    return 0;
+bool voile_ioPin_Get_ReadRegister_74595(voile_const_internal_ioPin_74595_t *this) {
+    return !!(*(this->chip->state+this->pinNumber/8) & (1ul << (this->pinNumber%8)));
 }
