@@ -1,6 +1,11 @@
+/**
+ * @file voile_iopin_74595_withoutqh.c
+ * @author JimmyWang
+ * @brief Define class ioPin for 54595
+ * @version alpha-240123
+ * 
+ */
 #include "voile_iopin_74595_withoutqh.h"
-
-
 
 voile_const_ioPin_Operate_t voile_const_ioPin_Operate_74595_withoutQH = {
     .Init = (voile_status_t (*)(voile_const_ioPin_t *))voile_ioPin_Operate_Init_74595_withoutQH,
